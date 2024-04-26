@@ -13,9 +13,9 @@ class AppConstants {
   );
 
   // Colors
- static const Color primaryColor = Color(0xFF181E50);
+  static const Color primaryColor = Color(0xFF1C1D59);
   static const Color secondaryColor = Color(0xFFF1DE3E);
-  static const Color primaryColorVeryLight =Color.fromARGB(255, 61, 67, 121);
+  static const Color primaryColorVeryLight = Color.fromARGB(255, 61, 67, 121);
   static const Color black = Color(0xFF171D29);
   static const Color textGrey = Color(0xFF919191);
   static const Color iconGrey = Color(0xFF8F8E94);

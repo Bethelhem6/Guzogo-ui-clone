@@ -26,10 +26,10 @@ class _RootScreenState extends State<RootScreen> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.white,
-      statusBarIconBrightness: Brightness.light,
-    ));
+    // SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    //   statusBarColor: Colors.white,
+    //   statusBarIconBrightness: Brightness.light,
+    // ));
     return WillPopScope(
       onWillPop: () async {
         if (_selectedIndex != 0) {
@@ -45,30 +45,32 @@ class _RootScreenState extends State<RootScreen> {
       },
       child: Scaffold(
         body: screens[_selectedIndex],
-        bottomNavigationBar: BottomNavigationBar(
-          
-          backgroundColor: Colors.white,
-          selectedItemColor: AppConstants.primaryColor,
-          unselectedItemColor: AppConstants.iconGrey,
-          showUnselectedLabels: true,
-          type: BottomNavigationBarType.fixed,
-          currentIndex: _selectedIndex,
-          iconSize: 30,
-
-          selectedFontSize: AppConstants.smallFont,
-          unselectedFontSize: AppConstants.smallFont,
-          // selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
-          onTap: (int index) {
-            setState(() => _selectedIndex = index);
-          },
-          items: [
-            BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
-            BottomNavigationBarItem(icon: Icon(Icons.work), label: "Booking"),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.notifications), label: "Notifications"),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.settings), label: "Setting"),
-          ],
+        bottomNavigationBar: Container(
+          decoration: const BoxDecoration(
+              border: Border(top: BorderSide(color: AppConstants.grey400))),
+          child: BottomNavigationBar(
+            backgroundColor: Colors.white,
+            selectedItemColor: AppConstants.primaryColor,
+            unselectedItemColor: AppConstants.iconGrey,
+            showUnselectedLabels: true,
+            type: BottomNavigationBarType.fixed,
+            currentIndex: _selectedIndex,
+            iconSize: 30,
+            selectedFontSize: AppConstants.smallFont,
+            unselectedFontSize: AppConstants.smallFont,
+            onTap: (int index) {
+              setState(() => _selectedIndex = index);
+            },
+            items: const [
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.search), label: "Search"),
+              BottomNavigationBarItem(icon: Icon(Icons.work), label: "Booking"),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.notifications), label: "Notifications"),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.settings), label: "Setting"),
+            ],
+          ),
         ),
       ),
     );
