@@ -1,13 +1,12 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:guzo_go_clone/bloc/update_trip_info_bloc/update_trip_info_bloc.dart';
+import 'package:guzo_go_clone/constants/constants.dart';
 import 'package:guzo_go_clone/routes/custom_route.dart';
 import 'package:guzo_go_clone/screens/screens.dart';
+import 'package:guzo_go_clone/util/helper.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-
-import 'package:guzo_go_clone/constants/constants.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,11 +17,31 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool isRound = true;
+  bool swapped = false;
   String selectedCabin = "Economy";
   int adult = 1;
   int children = 0;
   int infant = 0;
   Map infos = {};
+  @override
+  void initState() {
+    super.initState();
+
+    var src = getDayAndMonthName(DateTime.now().toString());
+    List<String> days = src.split(",");
+    tripInfo["date"] = days[0];
+    tripInfo["day"] = days[1];
+    tripInfo["month"] = days[2];
+    var res = getDayAndMonthName(
+        DateTime.now().add(const Duration(days: 15)).toString());
+    List<String> words = res.split(",");
+    tripInfo["return"]["date"] = words[0];
+    tripInfo["return"]["day"] = words[1];
+    tripInfo["return"]["month"] = words[2];
+
+    BlocProvider.of<UpdateTripInfoBloc>(context)
+        .add(UpdateTripInfo(source: const {}, destination: const {}));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,11 +70,40 @@ class _HomeScreenState extends State<HomeScreen> {
                             fit: BoxFit.cover),
                       ),
                     ),
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        height: 20.h,
+                        // padding: const EdgeInsets.only(left: 15, top: 25),
+                        decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                const Color.fromARGB(255, 12, 13, 83)
+                                    .withOpacity(.8),
+                                const Color.fromARGB(255, 12, 13, 83)
+                                    .withOpacity(.6),
+                                const Color.fromARGB(255, 12, 13, 83)
+                                    .withOpacity(.4),
+                                // AppConstants.primaryColor,
+                              ],
+                              stops: const [0.0, 0.1, 1.0],
+                            ),
+                            borderRadius: const BorderRadius.only(
+                              bottomLeft: Radius.circular(10),
+                              topLeft: Radius.circular(10),
+                            )),
+                      ),
+                    ),
                     Container(
                       height: 40.h,
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                          color: AppConstants.primaryColor.withOpacity(.9)),
+                          color: const Color.fromARGB(255, 3, 5, 88)
+                              .withOpacity(.8)),
                       child: Container(
                         alignment: Alignment.center,
                         // color: Colors.amber,
@@ -119,69 +167,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        CustomPageRoute(
-                                            child: const SearchAirportScreen(
-                                          isSource: true,
-                                        )));
-                                  },
-                                  child: Container(
-                                    width: 40.w,
-                                    height: 130,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        const Text(
-                                          "From",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: AppConstants.smallFont,
-                                              fontWeight: FontWeight.normal),
-                                        ),
-                                        Text(
-                                          infos["source"] == null
-                                              ? airports[0]["code"]!
-                                              : infos["source"]["code"] ?? "",
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 34,
-                                              fontWeight: FontWeight.w900),
-                                        ),
-                                        Text(
-                                          infos["source"] == null
-                                              ? airports[0]["city"]!
-                                              : infos["source"]["city"] ?? "",
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: AppConstants.smallFont,
-                                              fontWeight: FontWeight.normal),
-                                        ),
-                                        Text(
-                                          infos["source"] == null
-                                              ? airports[0]["airport"]!
-                                              : infos["source"]["airport"] ??
-                                                  "",
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: AppConstants.smallFont,
-                                              fontWeight: FontWeight.normal),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                                swapped
+                                    ? _destinationSelectWidget(context)
+                                    : _sourceSelectWidget(context),
                                 InkWell(
                                     onTap: () {
-                                      print(infos["source"]);
-                                      print(infos["destination"]);
-                                      var temp = infos["source"] ?? airports[0];
-                                      infos["source"] = infos["destination"];
-                                      infos["destination"] = temp;
-                                      print(infos);
+                                      swapped = !swapped;
                                       setState(() {});
                                     },
                                     child: Container(
@@ -195,70 +186,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                         color: AppConstants.primaryColor,
                                       ),
                                     )),
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        CustomPageRoute(
-                                            child: const SearchAirportScreen(
-                                          isSource: false,
-                                        )));
-                                  },
-                                  child: SizedBox(
-                                    width: 40.w,
-                                    height: 130,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        const Text(
-                                          "To",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: AppConstants.smallFont,
-                                              fontWeight: FontWeight.normal),
-                                        ),
-                                        infos["destination"] == null
-                                            ? Container(
-                                                height: 35,
-                                              )
-                                            : Text(
-                                                infos["destination"] == null
-                                                    ? ""
-                                                    : infos["destination"]
-                                                            ["code"] ??
-                                                        "",
-                                                style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 34,
-                                                    fontWeight:
-                                                        FontWeight.w900),
-                                              ),
-                                        Text(
-                                          infos["destination"] == null
-                                              ? "Select Destination"
-                                              : infos["destination"]["city"] ??
-                                                  "",
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: AppConstants.smallFont,
-                                              fontWeight: FontWeight.normal),
-                                        ),
-                                        Text(
-                                          infos["destination"] == null
-                                              ? ""
-                                              : infos["destination"]
-                                                      ["airport"] ??
-                                                  "",
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: AppConstants.smallFont,
-                                              fontWeight: FontWeight.normal),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                                swapped
+                                    ? _sourceSelectWidget(context)
+                                    : _destinationSelectWidget(context),
                               ],
                             )
                           ],
@@ -279,7 +209,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       top: 7.h,
                       child: InkWell(
                         onTap: () {
-                          Navigator.pop(context);
+                          selectedIndex = 2;
+                          BlocProvider.of<UpdateTripInfoBloc>(context)
+                              .add(NavigateEvent());
+                          // Navigator.push(context,
+                          //     customPageRoute(const NotificationScreen()));
                         },
                         child: Container(
                           padding: const EdgeInsets.all(5),
@@ -307,10 +241,26 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 InkWell(
                                   onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        CustomPageRoute(
-                                            child: VerticalCalendarApp()));
+                                    DatePicker.showDatePicker(context,
+                                        showTitleActions: true,
+                                        minTime: DateTime.now(),
+                                        maxTime: DateTime.now()
+                                            .add(const Duration(days: 700)),
+                                        onChanged: (date) {},
+                                        onConfirm: (date) {
+                                      var res =
+                                          getDayAndMonthName(date.toString());
+                                      List<String> words = res.split(",");
+                                      tripInfo["date"] = words[0];
+                                      tripInfo["day"] = words[1];
+                                      tripInfo["month"] = words[2];
+
+                                      BlocProvider.of<UpdateTripInfoBloc>(
+                                              context)
+                                          .add(UpdateTripInfo(
+                                              source: const {},
+                                              destination: const {}));
+                                    }, currentTime: DateTime.now());
                                   },
                                   child: Column(
                                     crossAxisAlignment:
@@ -332,16 +282,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                         margin: const EdgeInsets.symmetric(
                                           horizontal: 15,
                                         ),
-                                        child: const Row(children: [
+                                        child: Row(children: [
                                           Text(
-                                            "26",
-                                            style: TextStyle(
+                                            tripInfo["date"] ?? "",
+                                            style: const TextStyle(
                                                 color:
                                                     AppConstants.primaryColor,
                                                 fontWeight: FontWeight.w600,
                                                 fontSize: 56),
                                           ),
-                                          SizedBox(
+                                          const SizedBox(
                                             width: 10,
                                           ),
                                           Column(
@@ -349,16 +299,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                "Apr",
-                                                style: TextStyle(
+                                                tripInfo["month"] != null
+                                                    ? tripInfo["month"]
+                                                        .substring(0, 3)
+                                                    : "",
+                                                style: const TextStyle(
                                                     color: Colors.black,
                                                     fontWeight: FontWeight.bold,
                                                     fontSize:
                                                         AppConstants.largeFont),
                                               ),
                                               Text(
-                                                "Friday",
-                                                style: TextStyle(
+                                                tripInfo["day"] ?? "",
+                                                style: const TextStyle(
                                                     color: Colors.black,
                                                     fontWeight: FontWeight.w500,
                                                     fontSize: AppConstants
@@ -421,167 +374,195 @@ class _HomeScreenState extends State<HomeScreen> {
                               height: 25.h,
                               color: AppConstants.grey300,
                             ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    !isRound
-                                        ? Container()
-                                        : Container(
-                                            margin: const EdgeInsets.symmetric(
-                                              horizontal: 15,
-                                            ),
-                                            child: const Text(
-                                              "Return Date",
-                                              style: TextStyle(
-                                                  color: AppConstants.textGrey,
-                                                  fontSize:
-                                                      AppConstants.mediumFont),
-                                            ),
+                            InkWell(
+                              onTap: !isRound
+                                  ? null
+                                  : () {
+                                      DatePicker.showDatePicker(context,
+                                          showTitleActions: true,
+                                          minTime: DateTime.now(),
+                                          maxTime: DateTime.now()
+                                              .add(const Duration(days: 700)),
+                                          onChanged: (date) {},
+                                          onConfirm: (date) {
+                                        var res =
+                                            getDayAndMonthName(date.toString());
+                                        List<String> words = res.split(",");
+                                        tripInfo["return"]["date"] = words[0];
+                                        tripInfo["return"]["day"] = words[1];
+                                        tripInfo["return"]["month"] = words[2];
+
+                                        BlocProvider.of<UpdateTripInfoBloc>(
+                                                context)
+                                            .add(UpdateTripInfo(
+                                                source: const {},
+                                                destination: const {}));
+                                      }, currentTime: DateTime.now());
+                                    },
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  !isRound
+                                      ? Container()
+                                      : Container(
+                                          margin: const EdgeInsets.symmetric(
+                                            horizontal: 15,
                                           ),
-                                    !isRound
-                                        ? Container(
-                                            height: 13.h,
-                                          )
-                                        : Container(
-                                            margin: const EdgeInsets.symmetric(
-                                              horizontal: 15,
+                                          child: const Text(
+                                            "Return Date",
+                                            style: TextStyle(
+                                                color: AppConstants.textGrey,
+                                                fontSize:
+                                                    AppConstants.mediumFont),
+                                          ),
+                                        ),
+                                  !isRound
+                                      ? Container(
+                                          height: 13.h,
+                                        )
+                                      : Container(
+                                          margin: const EdgeInsets.symmetric(
+                                            horizontal: 15,
+                                          ),
+                                          child: Row(children: [
+                                            Text(
+                                              tripInfo["return"] == null
+                                                  ? ""
+                                                  : tripInfo["return"]
+                                                          ["date"] ??
+                                                      "",
+                                              style: const TextStyle(
+                                                  letterSpacing: 0,
+                                                  color:
+                                                      AppConstants.primaryColor,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 56),
                                             ),
-                                            child: Row(children: [
-                                              const Text(
-                                                "1",
-                                                style: TextStyle(
-                                                    letterSpacing: 0,
-                                                    color: AppConstants
-                                                        .primaryColor,
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 56),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            !isRound
+                                                ? Container()
+                                                : Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        tripInfo["return"] ==
+                                                                null
+                                                            ? ""
+                                                            : tripInfo["return"]
+                                                                    ["month"] ??
+                                                                "",
+                                                        style: const TextStyle(
+                                                            color: Colors.black,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize:
+                                                                AppConstants
+                                                                    .largeFont),
+                                                      ),
+                                                      Text(
+                                                        tripInfo["return"] ==
+                                                                null
+                                                            ? ""
+                                                            : tripInfo["return"]
+                                                                    ["day"] ??
+                                                                "",
+                                                        style: const TextStyle(
+                                                            color: Colors.black,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize:
+                                                                AppConstants
+                                                                    .mediumFont),
+                                                      ),
+                                                    ],
+                                                  ),
+                                          ]),
+                                        ),
+                                  Container(
+                                    width: 49.6.w,
+                                    height: 1,
+                                    color: AppConstants.grey300,
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      _showPassengers();
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 15,
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          const Text(
+                                            "Passengers",
+                                            style: TextStyle(
+                                                color: AppConstants.textGrey,
+                                                fontSize:
+                                                    AppConstants.mediumFont),
+                                          ),
+                                          Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.man,
+                                                color: AppConstants.iconGrey,
+                                              ),
+                                              Text(
+                                                adult.toString(),
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize:
+                                                        AppConstants.largeFont),
                                               ),
                                               const SizedBox(
-                                                width: 10,
+                                                width: 1,
                                               ),
-                                              !isRound
-                                                  ? Container()
-                                                  : const Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          "May",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize:
-                                                                  AppConstants
-                                                                      .largeFont),
-                                                        ),
-                                                        Text(
-                                                          "Saturday",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              fontSize:
-                                                                  AppConstants
-                                                                      .mediumFont),
-                                                        ),
-                                                      ],
-                                                    ),
-                                            ]),
-                                          ),
-                                    Container(
-                                      width: 49.6.w,
-                                      height: 1,
-                                      color: AppConstants.grey300,
-                                    ),
-                                    InkWell(
-                                      onTap: () {
-                                        _showPassengers();
-                                      },
-                                      child: Container(
-                                        margin: const EdgeInsets.symmetric(
-                                          horizontal: 15,
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const SizedBox(
-                                              height: 10,
-                                            ),
-                                            const Text(
-                                              "Passengers",
-                                              style: TextStyle(
-                                                  color: AppConstants.textGrey,
-                                                  fontSize:
-                                                      AppConstants.mediumFont),
-                                            ),
-                                            Row(
-                                              children: [
-                                                const Icon(
-                                                  Icons.man,
-                                                  color: AppConstants.iconGrey,
-                                                ),
-                                                Text(
-                                                  adult.toString(),
-                                                  style: const TextStyle(
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: AppConstants
-                                                          .largeFont),
-                                                ),
-                                                const SizedBox(
-                                                  width: 1,
-                                                ),
-                                                const Icon(
-                                                  Icons.man,
-                                                  size: 18,
-                                                  color: AppConstants.iconGrey,
-                                                ),
-                                                Text(
-                                                  children.toString(),
-                                                  style: const TextStyle(
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: AppConstants
-                                                          .largeFont),
-                                                ),
-                                                const SizedBox(
-                                                  width: 15,
-                                                ),
-                                                const Icon(
-                                                  Icons.girl,
-                                                  size: 20,
-                                                  color: AppConstants.iconGrey,
-                                                ),
-                                                Text(
-                                                  infant.toString(),
-                                                  style: const TextStyle(
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: AppConstants
-                                                          .largeFont),
-                                                ),
-                                              ],
-                                            )
-                                          ],
-                                        ),
+                                              const Icon(
+                                                Icons.man,
+                                                size: 18,
+                                                color: AppConstants.iconGrey,
+                                              ),
+                                              Text(
+                                                children.toString(),
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize:
+                                                        AppConstants.largeFont),
+                                              ),
+                                              const SizedBox(
+                                                width: 15,
+                                              ),
+                                              const Icon(
+                                                Icons.girl,
+                                                size: 20,
+                                                color: AppConstants.iconGrey,
+                                              ),
+                                              Text(
+                                                infant.toString(),
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize:
+                                                        AppConstants.largeFont),
+                                              ),
+                                            ],
+                                          )
+                                        ],
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -606,12 +587,130 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: TextStyle(
                         color: AppConstants.primaryColor,
                         fontWeight: FontWeight.bold,
-                        fontSize: AppConstants.mediumFont),
+                        fontSize: AppConstants.largeFont),
                   ),
                 )
               ],
             );
           },
+        ),
+      ),
+    );
+  }
+
+  InkWell _destinationSelectWidget(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+            context,
+            CustomPageRoute(
+                child: const SearchAirportScreen(
+              isSource: false,
+            )));
+      },
+      child: SizedBox(
+        width: 40.w,
+        height: 130,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              swapped ? "From" : "To",
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: AppConstants.smallFont,
+                  fontWeight: FontWeight.normal),
+            ),
+            infos["destination"] == null
+                ? Container(
+                    height: 35,
+                  )
+                : Text(
+                    infos["destination"] == null
+                        ? ""
+                        : infos["destination"]["code"] ?? "",
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 34,
+                        fontWeight: FontWeight.w900),
+                  ),
+            Text(
+              infos["destination"] == null
+                  ? swapped
+                      ? "destination"
+                      : "Select Destination"
+                  : infos["destination"]["city"] ?? "",
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: AppConstants.smallFont,
+                  fontWeight: FontWeight.normal),
+            ),
+            Text(
+              infos["destination"] == null
+                  ? ""
+                  : infos["destination"]["airport"] ?? "",
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: AppConstants.smallFont,
+                  fontWeight: FontWeight.normal),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  InkWell _sourceSelectWidget(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+            context,
+            CustomPageRoute(
+                child: const SearchAirportScreen(
+              isSource: true,
+            )));
+      },
+      child: Container(
+        width: 40.w,
+        height: 130,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              swapped ? "To" : "From",
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: AppConstants.smallFont,
+                  fontWeight: FontWeight.normal),
+            ),
+            Text(
+              infos["source"] == null
+                  ? airports[0]["code"]!
+                  : infos["source"]["code"] ?? "",
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 34,
+                  fontWeight: FontWeight.w900),
+            ),
+            Text(
+              infos["source"] == null
+                  ? airports[0]["city"]!
+                  : infos["source"]["city"] ?? "",
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: AppConstants.smallFont,
+                  fontWeight: FontWeight.normal),
+            ),
+            Text(
+              infos["source"] == null
+                  ? airports[0]["airport"]!
+                  : infos["source"]["airport"] ?? "",
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: AppConstants.smallFont,
+                  fontWeight: FontWeight.normal),
+            ),
+          ],
         ),
       ),
     );

@@ -21,5 +21,9 @@ class UpdateTripInfoBloc
       }
       emit(UpdateTripInfoSuccess(tripInfo: tripInfo));
     });
+    on<NavigateEvent>((event, emit) {
+      selectedIndex = 2;
+      emit(NavigateStateSuccess(selectedIndex: selectedIndex));
+    });
   }
 }

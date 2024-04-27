@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
                 textTheme: GoogleFonts.leagueSpartanTextTheme(
                           Theme.of(context).textTheme),
             ),
-            home: const RootScreen()),
+            home: const OnboardingScreen()),
       );
     });
   }

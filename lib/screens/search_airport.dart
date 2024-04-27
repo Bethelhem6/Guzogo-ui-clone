@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guzo_go_clone/bloc/update_trip_info_bloc/update_trip_info_bloc.dart';
 import 'package:guzo_go_clone/constants/constants.dart';
@@ -14,6 +12,8 @@ class SearchAirportScreen extends StatefulWidget {
 }
 
 class _SearchAirportScreenState extends State<SearchAirportScreen> {
+  bool search = false;
+  List searchResults = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,6 +76,16 @@ class _SearchAirportScreenState extends State<SearchAirportScreen> {
                     borderSide: BorderSide.none,
                   ),
                 ),
+                onChanged: (value) {
+                  search = true;
+
+                  searchResults = airports
+                      .where((element) => element["city"]!
+                          .toLowerCase()
+                          .startsWith(value.toLowerCase()))
+                      .toList();
+                  setState(() {});
+                },
               ),
             ),
             const SizedBox(
@@ -99,17 +109,18 @@ class _SearchAirportScreenState extends State<SearchAirportScreen> {
             ),
             Expanded(
                 child: ListView.builder(
-                    itemCount: airports.length,
+                    itemCount: search ? searchResults.length : airports.length,
                     itemBuilder: (context, index) {
                       return InkWell(
                         onTap: () {
                           widget.isSource
                               ? BlocProvider.of<UpdateTripInfoBloc>(context)
                                   .add(UpdateTripInfo(
-                                      source: airports[index], destination: {}))
+                                      source: airports[index],
+                                      destination: const {}))
                               : BlocProvider.of<UpdateTripInfoBloc>(context)
                                   .add(UpdateTripInfo(
-                                      source: {},
+                                      source: const {},
                                       destination: airports[index]));
                           Navigator.pop(context);
                         },
@@ -121,13 +132,18 @@ class _SearchAirportScreenState extends State<SearchAirportScreen> {
                             children: [
                               Row(
                                 children: [
-                                  const Icon(Icons.airplanemode_on_rounded),
+                                  const Icon(
+                                    Icons.airplanemode_on_rounded,
+                                    color: AppConstants.iconGrey,
+                                  ),
                                   const SizedBox(
                                     width: 5,
                                   ),
                                   Expanded(
                                     child: Text(
-                                      "${airports[index]["city"]}, ${airports[index]["airport"]} (${airports[index]["code"]})",
+                                      search
+                                          ? "${searchResults[index]["city"]}, ${searchResults[index]["airport"]} (${searchResults[index]["code"]})"
+                                          : "${airports[index]["city"]}, ${airports[index]["airport"]} (${airports[index]["code"]})",
                                       style: const TextStyle(
                                           color: Colors.black,
                                           fontSize: AppConstants.mediumFont,

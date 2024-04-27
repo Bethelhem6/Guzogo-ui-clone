@@ -8,3 +8,7 @@ class UpdateTripInfo extends UpdateTripInfoEvent {
   final Map destination;
   UpdateTripInfo({required this.source, required this.destination});
 }
+
+class NavigateEvent extends UpdateTripInfoEvent {
+  NavigateEvent();
+}

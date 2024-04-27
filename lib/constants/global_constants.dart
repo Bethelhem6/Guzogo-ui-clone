@@ -74,4 +74,5 @@ List<Map<String, String>> airports = [
   {"city": "Sydney", "airport": "Kingsford Smith Airport", "code": "SYD"},
 ];
 
-Map tripInfo = {};
+Map tripInfo = {"return": {}};
+int selectedIndex=0;

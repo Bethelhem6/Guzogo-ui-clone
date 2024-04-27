@@ -13,3 +13,7 @@ final class UpdateTripInfoSuccess extends UpdateTripInfoState {
 }
 
 final class UpdateTripInfoError extends UpdateTripInfoState {}
+final class NavigateStateSuccess extends UpdateTripInfoState {
+  final int selectedIndex;
+   NavigateStateSuccess({required this.selectedIndex});
+}

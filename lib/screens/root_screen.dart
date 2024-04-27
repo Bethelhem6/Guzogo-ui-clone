@@ -2,7 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guzo_go_clone/bloc/update_trip_info_bloc/update_trip_info_bloc.dart';
 import 'package:guzo_go_clone/constants/app_constants.dart';
+import 'package:guzo_go_clone/constants/constants.dart';
 import 'package:guzo_go_clone/screens/screens.dart';
 
 class RootScreen extends StatefulWidget {
@@ -44,35 +47,51 @@ class _RootScreenState extends State<RootScreen> {
         }
       },
       child: Scaffold(
-        body: screens[_selectedIndex],
-        bottomNavigationBar: Container(
-          decoration: const BoxDecoration(
-              border: Border(top: BorderSide(color: AppConstants.grey400))),
-          child: BottomNavigationBar(
-            backgroundColor: Colors.white,
-            selectedItemColor: AppConstants.primaryColor,
-            unselectedItemColor: AppConstants.iconGrey,
-            showUnselectedLabels: true,
-            type: BottomNavigationBarType.fixed,
-            currentIndex: _selectedIndex,
-            iconSize: 30,
-            selectedFontSize: AppConstants.smallFont,
-            unselectedFontSize: AppConstants.smallFont,
-            onTap: (int index) {
-              setState(() => _selectedIndex = index);
+          body: BlocConsumer<UpdateTripInfoBloc, UpdateTripInfoState>(
+            listener: (context, state) {
+              if (state is NavigateStateSuccess) {
+                _selectedIndex = state.selectedIndex;
+              }
             },
-            items: const [
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.search), label: "Search"),
-              BottomNavigationBarItem(icon: Icon(Icons.work), label: "Booking"),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.notifications), label: "Notifications"),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.settings), label: "Setting"),
-            ],
+            builder: (context, state) {
+              return screens[_selectedIndex];
+            },
           ),
-        ),
-      ),
+          bottomNavigationBar: BlocConsumer<UpdateTripInfoBloc, UpdateTripInfoState>(
+            listener: (context, state) {},
+            builder: (context, state) {
+              return Container(
+                decoration: const BoxDecoration(
+                    border:
+                        Border(top: BorderSide(color: AppConstants.grey400))),
+                child: BottomNavigationBar(
+                  backgroundColor: Colors.white,
+                  selectedItemColor: AppConstants.primaryColor,
+                  unselectedItemColor: AppConstants.iconGrey,
+                  showUnselectedLabels: true,
+                  type: BottomNavigationBarType.fixed,
+                  currentIndex: _selectedIndex,
+                  iconSize: 30,
+                  selectedFontSize: AppConstants.smallFont,
+                  unselectedFontSize: AppConstants.smallFont,
+                  onTap: (int index) {
+                    setState(() => _selectedIndex = index);
+                  },
+                  items: const [
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.search), label: "Search"),
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.work), label: "Booking"),
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.notifications),
+                        label: "Notifications"),
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.settings), label: "Setting"),
+                  ],
+                ),
+              );
+            },
+          )),
     );
   }
 
