@@ -10,14 +10,10 @@ class UpdateTripInfoBloc
   UpdateTripInfoBloc() : super(UpdateTripInfoInitial()) {
     on<UpdateTripInfo>((event, emit) {
       if (event.source["city"] != null) {
-        tripInfo = {
-          "source": event.source,
-        };
+        tripInfo["source"] = event.source;
       }
       if (event.destination["city"] != null) {
-        tripInfo = {
-          "destination": event.destination,
-        };
+        tripInfo["destination"] = event.destination;
       }
       emit(UpdateTripInfoSuccess(tripInfo: tripInfo));
     });
