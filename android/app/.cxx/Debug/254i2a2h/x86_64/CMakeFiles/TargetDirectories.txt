@@ -1,0 +1,2 @@
+/home/betty/projects/personal/dummy apps/Guzogo-ui-clone/android/app/.cxx/Debug/254i2a2h/x86_64/CMakeFiles/edit_cache.dir
+/home/betty/projects/personal/dummy apps/Guzogo-ui-clone/android/app/.cxx/Debug/254i2a2h/x86_64/CMakeFiles/rebuild_cache.dir

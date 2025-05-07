@@ -725,7 +725,7 @@ class _HomeScreenState extends State<HomeScreen> {
           return StatefulBuilder(builder: (context, setState) {
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              height: 25.h,
+              height: 27.h,
               decoration: const BoxDecoration(
                 color: Colors.white,
                 // borderRadius: BorderRadius.only(

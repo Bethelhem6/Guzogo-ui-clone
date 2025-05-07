@@ -1,0 +1,28 @@
+{
+  "buildFiles": [
+    "/home/betty/snap/flutter/common/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/home/betty/Android/Sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/home/betty/projects/personal/dummy apps/Guzogo-ui-clone/android/app/.cxx/Debug/254i2a2h/armeabi-v7a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/home/betty/Android/Sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/home/betty/projects/personal/dummy apps/Guzogo-ui-clone/android/app/.cxx/Debug/254i2a2h/armeabi-v7a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {},
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "/home/betty/Android/Sdk/ndk/26.3.11579264/toolchains/llvm/prebuilt/linux-x86_64/bin/clang.lld",
+      "cppCompilerExecutable": "/home/betty/Android/Sdk/ndk/26.3.11579264/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++.lld"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": []
+}

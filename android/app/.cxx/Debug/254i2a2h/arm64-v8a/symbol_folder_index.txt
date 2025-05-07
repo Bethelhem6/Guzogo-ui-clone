@@ -1,0 +1,1 @@
+/home/betty/projects/personal/dummy apps/Guzogo-ui-clone/build/app/intermediates/cxx/Debug/254i2a2h/obj/arm64-v8a
